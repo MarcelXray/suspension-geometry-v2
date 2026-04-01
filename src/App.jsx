@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { buildSide, chassisInnerPivots, deriveParams, instantCenter, rollCenterHeight, camberDeg, rcCurvePoints } from './suspension.js'
 
-const BUILD_DATE = '01.04.2026 07:09'
+const BUILD_DATE = '01.04.2026 07:19'
 
 const DEFAULTS = {
   rideH: 5.2, chassisH: 1.2,
@@ -221,11 +221,11 @@ export default function App() {
   const redraw = useCallback(() => {
     const canvas = canvasRef.current; if (!canvas) return
     const dpr = window.devicePixelRatio || 1
-    const parent = canvas.parentElement
-    // Always use parent element size — most reliable on mobile
-    const W = Math.round((parent ? parent.clientWidth  : canvas.clientWidth  || 300) * dpr)
-    const H = Math.round((parent ? parent.clientHeight : canvas.clientHeight || 200) * dpr)
-    if (W < 10 || H < 10) return  // not yet laid out
+    // getBoundingClientRect gives the actual rendered size in CSS pixels
+    const rect = canvas.getBoundingClientRect()
+    const W = Math.round((rect.width  || canvas.offsetWidth  || 300) * dpr)
+    const H = Math.round((rect.height || canvas.offsetHeight || 200) * dpr)
+    if (W < 10 || H < 10) return
     if (canvas.width !== W || canvas.height !== H) {
       canvas.width  = W
       canvas.height = H
@@ -325,9 +325,10 @@ export default function App() {
       </div>
 
       {/* CANVAS */}
-      <div className="mid" style={{ background: T.canvasBg, maxWidth: 900, maxHeight: 640 }}>
+      <div className="mid" style={{ background: T.canvasBg }}>
         <canvas ref={canvasRef} onWheel={handleWheel}
-          style={{ width: '100%', height: '100%', display: 'block', cursor: 'crosshair' }} />
+          style={{ width: '100%', height: '100%', display: 'block', cursor: 'crosshair' }}
+          width="300" height="200" />
       </div>
 
       {/* RIGHT */}
