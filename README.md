@@ -2,7 +2,7 @@
 
 Interaktiver Doppelquerlenker-Geometrie-Visualisierer für 1:10 RC-Tourenwagen.
 
-🔗 **[Live-Demo](https://marcelxray.github.io/suspension-geometry/)**
+🔗 **[Live-Demo](https://marcelxray.github.io/suspension-geometry-v2/)**
 
 ## Features
 - Kinematische Berechnung (Rollzentrum, Sturz, Momentanpol)

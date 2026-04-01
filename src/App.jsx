@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { buildSide, chassisInnerPivots, deriveParams, instantCenter, rollCenterHeight, camberDeg, rcCurvePoints } from './suspension.js'
 
-const BUILD_DATE = '01.04.2026 06:09'
+const BUILD_DATE = '01.04.2026 07:09'
 
 const DEFAULTS = {
   rideH: 5.2, chassisH: 1.2,
@@ -89,20 +89,16 @@ function extLine(ctx, a, b, ext, sx, sy) {
 function drawScene(canvas, s, zoom, T) {
   const ctx = canvas.getContext('2d'), W = canvas.width, H = canvas.height
   ctx.clearRect(0, 0, W, H); ctx.fillStyle = T.canvasBg; ctx.fillRect(0, 0, W, H)
-  // World bounds:
-  //   X: -halfTrack-10 .. +halfTrack+10  (symmetric, centre=0)
-  //   Y: -8 (below ground) .. upperArmTop (≈ rideH+chassisH+upperInnerYOffset+8)
-  const worldW = (s.halfTrack + 15) * 2
-  const yTop   = s.rideH + s.chassisH + s.upperInnerYOffset + 10
-  const yBot   = -(s.tireRadius * 0.15)   // slightly below ground
-  const worldH = yTop - yBot
-  const scale  = Math.min(W / worldW, H / worldH) * zoom
-  const ox     = W / 2
-  // oy = screen pixel for world Y=0
-  // world centre Y = (yTop + yBot)/2 → should map to screen H/2
-  // oy - worldCentreY*scale = H/2  →  oy = H/2 + worldCentreY*scale
-  const worldCentreY = (yTop + yBot) / 2
-  const oy = H / 2 + worldCentreY * scale
+  // World bounds based on actual geometry settings
+  const yTop    = s.rideH + s.chassisH + s.upperInnerYOffset + 8  // top of upper arm
+  const yBot    = -4                                                 // below ground
+  const xRange  = s.halfTrack + 15                                   // half total width
+  const worldW  = xRange * 2
+  const worldH  = yTop - yBot
+  const scale   = Math.min(W / worldW, H / worldH) * zoom
+  const ox      = W / 2
+  // Centre vertically: world midpoint maps to screen centre
+  const oy      = H / 2 + ((yTop + yBot) / 2) * scale
   const sx = wx => ox + wx * scale, sy = wy => oy - wy * scale
   const params = deriveParams(s)
   const hw = (params.upperInnerX + params.lowerInnerX) / 2
@@ -329,7 +325,7 @@ export default function App() {
       </div>
 
       {/* CANVAS */}
-      <div className="mid" style={{ background: T.canvasBg }}>
+      <div className="mid" style={{ background: T.canvasBg, maxWidth: 900, maxHeight: 640 }}>
         <canvas ref={canvasRef} onWheel={handleWheel}
           style={{ width: '100%', height: '100%', display: 'block', cursor: 'crosshair' }} />
       </div>
